@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, interval } from 'rxjs';
-import { switchMap, startWith } from 'rxjs/operators';
+import { switchMap, startWith, map } from 'rxjs/operators';
 import { CryptoResponse } from '../models/crypto.model';
 
 /**
@@ -15,8 +15,10 @@ import { CryptoResponse } from '../models/crypto.model';
 })
 export class CryptoService {
 
-  // Using a relative URL to leverage the Angular Proxy (bypasses CORS issues during development)
-  private apiUrl = '/api/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd';
+  // Using Binance API directly.
+  // Unlike CoinGecko, Binance allows Cross-Origin Resource Sharing (CORS) from the browser,
+  // which means we don't need a proxy in production (e.g., on Vercel).
+  private apiUrl = 'https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","ETHUSDT","SOLUSDT"]';
 
   // HttpClient is injected as private to encapsulate the dependency (Low Coupling)
   constructor(private http: HttpClient) { }
@@ -28,7 +30,7 @@ export class CryptoService {
    */
   getCryptoPricesLive(): Observable<CryptoResponse> {
     // interval(60000) emits a value every 60 seconds.
-    // We use 60s instead of 5s to respect CoinGecko's rate limits (HTTP 429 prevention).
+    // We use 60s instead of 5s to respect rate limits (HTTP 429 prevention).
     return interval(60000).pipe(
 
       // startWith(0) triggers the first HTTP request immediately,
@@ -38,7 +40,21 @@ export class CryptoService {
       // switchMap is the key operator here:
       // Every time the interval emits, it cancels any previous pending HTTP request
       // and starts a new one, preventing race conditions and memory leaks.
-      switchMap(() => this.http.get<CryptoResponse>(this.apiUrl, { responseType: 'json' }))
+      switchMap(() => this.http.get<any[]>(this.apiUrl)),
+
+      // map transforms the raw Binance response array into our expected 'CryptoResponse' interface.
+      // This ensures our component receives data in the exact format it expects.
+      map(data => {
+        const btc = data.find(item => item.symbol === 'BTCUSDT')?.price || '0';
+        const eth = data.find(item => item.symbol === 'ETHUSDT')?.price || '0';
+        const sol = data.find(item => item.symbol === 'SOLUSDT')?.price || '0';
+
+        return {
+          bitcoin: { usd: parseFloat(btc) },
+          ethereum: { usd: parseFloat(eth) },
+          solana: { usd: parseFloat(sol) }
+        };
+      })
     );
   }
 }
