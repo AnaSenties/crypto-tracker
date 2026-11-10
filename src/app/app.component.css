@@ -1,0 +1,55 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #f8fafc;
+}
+
+p {
+  color: #94a3b8;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.cards-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Error Message Styling */
+.error-message {
+  color: #f87171; /* Red */
+  background-color: rgba(248, 113, 113, 0.1);
+  border: 1px solid #f87171;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem auto;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Loading State Styling */
+.loading {
+  color: #94a3b8;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  font-style: italic;
+  animation: pulse 1.5s infinite;
+}
+
+/* Simple pulse animation for loading effect */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

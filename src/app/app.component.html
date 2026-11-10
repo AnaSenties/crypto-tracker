@@ -1,0 +1,45 @@
+
+<div class="container">
+  <h1>🚀 Crypto Tracker</h1>
+  <p>Real-time cryptocurrency prices</p>
+
+  <!-- Error State: Displays if the API request fails (e.g., Rate Limit or Network Error) -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!--
+    Smart Rendering:
+    *ngIf ensures the cards only render when 'cryptoData' has a value,
+    preventing "Cannot read property of null" errors on initial load.
+  -->
+  <div class="cards-container" *ngIf="cryptoData; else loading">
+
+    <!-- Passing data to Dumb Components via Property Binding [ ] -->
+    <app-crypto-card
+      name="Bitcoin (BTC)"
+      [price]="cryptoData.bitcoin.usd">
+    </app-crypto-card>
+
+    <app-crypto-card
+      name="Ethereum (ETH)"
+      [price]="cryptoData.ethereum.usd">
+    </app-crypto-card>
+
+    <app-crypto-card
+      name="Solana (SOL)"
+      [price]="cryptoData.solana.usd">
+    </app-crypto-card>
+
+  </div>
+
+  <!--
+    Loading State (Else block):
+    This is an Angular structural directive. If cryptoData is null, this template shows up.
+  -->
+  <ng-template #loading>
+    <div class="loading">
+      <p>Fetching real-time prices...</p>
+    </div>
+  </ng-template>
+</div>
